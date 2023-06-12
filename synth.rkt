@@ -47,7 +47,7 @@
               (cons dipped (apply eval s quot))]
              [(_ _) (assert #f "evaluation stuck")]))
 
-(define max-eval-recursion-depth (make-parameter 50))
+(define max-eval-recursion-depth (make-parameter 11))
 
 (define (eval stack . words)
   (assert (> (max-eval-recursion-depth) 0) "eval recursion depth exceeded")
@@ -108,22 +108,20 @@
 
 ; Stack Shuffling
 
-(displayln "# Stack shuffling")
+(displayln "# Stack shuffling: rotate top 3 items on the stack")
+
 ; [x w v] | [swap] dip
 ; [w x v] | swap
-; [w v x] | [swap] dip
-; [v w x]
-(define rot-3-sketch (words '() #:depth 5))
-#|(list
-   (lit (list (swap))) (dip)
-   (swap)
-   (lit (list (swap))) (dip)))|#
+; [w v x]
+(define rot-3-sketch
+  (words '() #:depth 3))
+
 (evaluate rot-3-sketch
           (synthesize
            #:forall (list v w x)
            #:guarantee (assert (equal?
                                 (apply eval (list v w x) rot-3-sketch)
-                                (list x w v)))))
+                                (list x v w)))))
 
 (define (quadratic a b c x)
   (+ (* a x x) (* b x) c))
